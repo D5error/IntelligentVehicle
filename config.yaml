@@ -1,0 +1,13 @@
+# 网络参数
+net: 3gKPGpeMxTbFYFDbmdgnG4pmdV9r,192.168.56.1,2006,2007
+
+# 纯跟踪算法
+Ld: 2
+L: 2.5
+route_path: route/外圈.json
+
+# 车辆线速度
+speed: 10
+
+# 开启小地图功能会影响跟踪性能
+minimap: False
