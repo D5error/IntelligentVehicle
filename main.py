@@ -2,9 +2,8 @@ import math
 import time
 from my_udp import UDPClient
 from lib.util import *
-from lib.algorithm import pure_pursuit
+from lib.algorithm import dynamic_speed, pure_pursuit
 from lib.minimap import Minimap
-
 
 
 class Control:
@@ -23,13 +22,6 @@ class Control:
         
     def control_node(self):
         start_time = time.time()
-        L = self.config["L"]
-        Ld = self.config["Ld"]
-        speed = self.config["speed"]
-        route_path = self.config["route_path"]
-
-        # 加载路径
-        route = load_route(route_path)
 
         # 加载小地图
         minimap = Minimap(self.config["minimap"])
@@ -40,17 +32,17 @@ class Control:
             self.m_y = vehicle_data.y
             self.m_yaw = vehicle_data.yaw / 180 * math.pi
 
-            delta, target_point = pure_pursuit(self.m_x, self.m_y, self.m_yaw, route, Ld, L)
+            delta, target_point = pure_pursuit(self.m_x, self.m_y, self.m_yaw, vehicle_data.speed)
             # print(f"当前坐标: ({self.m_x: .3f} -> {target_point[0]}, {self.m_y: .3f} -> {target_point[1]}), yaw: {self.m_yaw}")
 
+            # 更新小地图
+            minimap.update_plot(vehicle_data, target_point)
 
-            v = speed
+            # 更新速度和转向角
+            v = dynamic_speed(self.m_x, self.m_y)
             w = delta
 
             self.udp_client.send_control_command(v, w)
-
-            # 更新小地图
-            minimap.update_plot(vehicle_data, route, target_point)
 
             elapsed_time = time.time() - start_time
             sleep_time = max((1.0 / self.control_rate) - elapsed_time, 0.0)

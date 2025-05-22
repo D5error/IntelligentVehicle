@@ -3,7 +3,7 @@ import logging
 import socket
 import threading
 from lib.vehicle import VehicleData, AllVehicleData
-
+from lib.util import load_config
 
 class UDPClient:
     def __init__(self, ip, port, send_port, vehicle_name):
@@ -55,10 +55,15 @@ class UDPClient:
         return self.vehicle_data
 
     def get_global_state(self):
+        config = load_config("config.yaml")
+        is_print_vehicles = config['print_vehicles']
+
         while True:
             data0, addr =self.sock.recvfrom(10240)
             data1 = data0.decode()
             data = json.loads(data1)
+
+            # 解析数据
             try:
                 for vehicle in data['vehicles']:
                     vehicle_data = VehicleData()
@@ -69,9 +74,12 @@ class UDPClient:
                     vehicle_data.speed = vehicle['speed']
                     self.all_vehicle_data.update_vehicle_data(vehicle_data)
 
+                # 打印所有车辆状态
+                if is_print_vehicles:
+                    print(self.all_vehicle_data.get_all_vehicle_data())
+
             except Exception as e:
                 self.logger.error(e)
-            print(self.all_vehicle_data.get_all_vehicle_data())
 
     def send_control_command(self, v, w):
         message = '{"name":"' + self.vehicle_name + '","vx":%f,"vz":%f}' % (v, w)

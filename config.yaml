@@ -1,13 +1,33 @@
 # 网络参数
-net: 3gKPGpeMxTbFYFDbmdgnG4pmdV9r,192.168.56.1,2006,2007
+net: 3gKPGpeMxTbFYFDbmdgnG4pmdV9r,192.168.56.1,9230,9231
 
 # 纯跟踪算法
-Ld: 2
-L: 2.5
 route_path: route/外圈.json
+Ld: 2 # 前视距离
+L: 2.5 # 车轴间距
+dynamic_Ld: True # 开启动态调整Ld后，上面的Ld无效，Ld = k * speed + c
+k: 0.01
+c: 1.1
+speed: 17 # 车辆线速度
 
-# 车辆线速度
-speed: 10
+# 开启小地图功能会严重影响跟踪性能！！！
+minimap: True
+map_path: map/map_compressed.png
 
-# 开启小地图功能会影响跟踪性能
-minimap: False
+# 打印所有车辆的信息
+print_vehicles: False
+
+braking_distance: 30 # 当前车辆与拐弯点的距离小于该值时，减速
+turning_speed: 11 # 转弯时的速度
+turning_points: # 转弯点
+  - x: 7.95
+    y: 152.1
+
+  - x: 7.95
+    y: 11.8
+
+  - x: 152.2
+    y: 152.1
+
+  - x: 152.2
+    y: 11.8

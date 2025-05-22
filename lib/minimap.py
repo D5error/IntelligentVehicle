@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-
+from lib.util import load_config, load_route
 from lib.vehicle import VehicleData
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体或其他支持中文的字体
 plt.rcParams['axes.unicode_minus'] = False    # 解决负号 '-' 显示为方块的问题
+route = load_route(load_config("config.yaml")["route_path"])
 
 # 一个可视化窗口
 class Minimap:
@@ -26,12 +27,13 @@ class Minimap:
         self.ax.set_ylim(-5, 165)   # y轴范围
 
         # 加载背景图片（路径根据你的实际情况修改）
-        self.bg_image = mpimg.imread('./map_small.png')
+        config = load_config("config.yaml")
+        self.bg_image = mpimg.imread(config['map_path'])
         # 查看图片
         plt.imshow(self.bg_image, extent=[0, 160, 0, 160], aspect='auto') 
-        self.ax.imshow(self.bg_image, extent=[0, 160, 0, 160], aspect='auto', alpha=0.5)
+        # self.ax.imshow(self.bg_image, extent=[0, 160, 0, 160], aspect='auto', alpha=0.5)
 
-    def update_plot(self, vehicle_data: VehicleData, route, target_point):
+    def update_plot(self, vehicle_data: VehicleData, target_point):
         if not self.use_minimap:
             return
 
