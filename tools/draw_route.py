@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import json
 import os
 import sys
-import matplotlib.image as mpimg
 sys.path.append(os.getcwd())
+import matplotlib.image as mpimg
 from lib.util import load_config
 
 

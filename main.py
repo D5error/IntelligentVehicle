@@ -1,17 +1,13 @@
 import math
 import time
 from my_udp import UDPClient
-from lib.util import *
-from lib.algorithm import dynamic_speed, pure_pursuit
-from lib.minimap import Minimap
+from lib import util, algorithm, minimap, vehicle
 
 
 class Control:
     def __init__(self):
-        self.config = load_config("config.yaml")
-        
-        net = self.config["net"]
-        self.udp_client = UDPClient(*split_net(net))
+        net = util.load_config().net
+        self.udp_client = UDPClient(*util.split_net(net))
 
         self.m_v = 0
         self.m_x = 0
@@ -24,26 +20,44 @@ class Control:
         start_time = time.time()
 
         # 加载小地图
-        minimap = Minimap(self.config["minimap"])
+        map = minimap.Minimap()
 
         while True:
+            # 获取当前车辆的状态
             vehicle_data = self.udp_client.get_vehicle_state()
             self.m_x = vehicle_data.x
             self.m_y = vehicle_data.y
             self.m_yaw = vehicle_data.yaw / 180 * math.pi
 
-            delta, target_point = pure_pursuit(self.m_x, self.m_y, self.m_yaw, vehicle_data.speed)
-            # print(f"当前坐标: ({self.m_x: .3f} -> {target_point[0]}, {self.m_y: .3f} -> {target_point[1]}), yaw: {self.m_yaw}")
+            # 获取全局车辆
+            all_vehicles = self.udp_client.get_all_vehicle_state()
 
-            # 更新小地图
-            minimap.update_plot(vehicle_data, target_point)
+            # 纯跟踪算法
+            delta, target_point = algorithm.pure_pursuit(self.m_x, self.m_y, self.m_yaw, vehicle_data.speed)
+
+            # 冲突检测
+            fake_car = vehicle.VehicleData() # 测试用
+            fake_car.set_vehicle_stake(100, 153, "D5") # 测试用
+            all_vehicles.update_vehicle_data(fake_car) # 测试用
+            is_conflict = algorithm.conflict_detection(vehicle_data, all_vehicles.get_data())
 
             # 更新速度和转向角
-            v = dynamic_speed(self.m_x, self.m_y)
-            w = delta
+            if is_conflict:
+                v = 0
+                w = 0
+                print("刹车")
 
+            else:
+                v = algorithm.dynamic_speed(self.m_x, self.m_y)
+                w = delta
+
+            # 更新小地图
+            map.update_plot(vehicle_data, target_point, all_vehicles.get_data())
+
+            # 发送控制命令
             self.udp_client.send_control_command(v, w)
 
+            # 控制频率
             elapsed_time = time.time() - start_time
             sleep_time = max((1.0 / self.control_rate) - elapsed_time, 0.0)
             time.sleep(sleep_time)

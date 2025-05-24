@@ -1,33 +1,43 @@
 # 网络参数
-net: 3gKPGpeMxTbFYFDbmdgnG4pmdV9r,192.168.56.1,9230,9231
+net: 3gKPGpeMxTbFYFDbmdgnG4pmdV9r,192.168.56.1,1340,1341
+
 
 # 纯跟踪算法
-route_path: route/外圈.json
+route_path: route/外圈.json # 跟踪路线
 Ld: 2 # 前视距离
 L: 2.5 # 车轴间距
 dynamic_Ld: True # 开启动态调整Ld后，上面的Ld无效，Ld = k * speed + c
 k: 0.01
 c: 1.1
-speed: 17 # 车辆线速度
+speed: 19 # 车辆线速度
 
-# 开启小地图功能会严重影响跟踪性能！！！
-minimap: True
-map_path: map/map_compressed.png
+
+# 开启小地图实时追踪功能会影响跟踪性能！！！
+minimap_tracking: True
+map_path: map/map_250_250.png
+trajectory_length: 100 # 轨迹长度
+update_count: 20 # 每多少次更新一次小地图
+
 
 # 打印所有车辆的信息
 print_vehicles: False
 
-braking_distance: 30 # 当前车辆与拐弯点的距离小于该值时，减速
-turning_speed: 11 # 转弯时的速度
+
+# 冲突检测
+safe_distance: 3 # 安全距离
+
+
+braking_distance: 15 # 当前车辆与转弯点的距离小于该值时，减速
+turning_speed: 8 # 转弯时的速度
 turning_points: # 转弯点
-  - x: 7.95
-    y: 152.1
+  - x: 7.741935483870968
+    y: 152.4675324675325
 
-  - x: 7.95
-    y: 11.8
+  - x: 152.28342872008324
+    y: 151.98716056670605
 
-  - x: 152.2
-    y: 152.1
+  - x: 152.59192163740724
+    y: 10.989521841794577
 
-  - x: 152.2
-    y: 11.8
+  - x: 7.023919391705093
+    y: 9.412312626496906
