@@ -22,6 +22,10 @@ def pure_pursuit(curr_x, curr_y, curr_yaw, v_x):
     # 动态调整预瞄距离
     Ld = config.k * v_x + config.c if config.dynamic_Ld else config.Ld
 
+    # 打印Ld
+    if config.print_Ld:
+        print(f"Ld: {Ld}")
+
     # 计算转向角
     delta = math.atan2(2.0 * config.L * np.sin(alpha), Ld)
 
@@ -65,6 +69,6 @@ def conflict_detection(my_vehicle: vehicle.VehicleData, all_vehicles: dict[str, 
 
         distance = np.hypot(my_vehicle.x - other_vehicle.x, my_vehicle.y - other_vehicle.y)
         if distance < config.safe_distance:
-            print(f"距离车辆'{other_vehicle.name}'{distance}m，低于安全距离！")
+            # print(f"距离车辆'{other_vehicle.name}'{distance}m，低于安全距离！")
             return True
     return False

@@ -80,7 +80,9 @@ class Minimap:
         if hasattr(self, 'other_vehicle'):
             self.other_vehicle.remove()
         self.other_vehicle = self.ax.scatter([], [], c='r', label="其他车辆")
-        self.other_vehicle.set_offsets(list(zip(other_vehicle_x, other_vehicle_y)))
+        zipped_data = list(zip(other_vehicle_x, other_vehicle_y))
+        if zipped_data:  # 检查 zipped_data 是否为空
+            self.other_vehicle.set_offsets(zipped_data)
 
         # 更新轨迹
         self.trajectory_x.append(vehicle_data.x)

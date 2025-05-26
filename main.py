@@ -1,7 +1,7 @@
 import math
 import time
 from my_udp import UDPClient
-from lib import util, algorithm, minimap, vehicle
+from lib import util, algorithm, minimap
 
 
 class Control:
@@ -15,7 +15,12 @@ class Control:
         self.m_yaw = 0
 
         self.control_rate = 10  # hz
-        
+
+        # 创建服务器
+        # self.server = server.Server(self.receive_from_server)
+        # self.all_vehicles = self.udp_client.get_all_vehicle_state()
+        # self.server.start()
+
     def control_node(self):
         start_time = time.time()
 
@@ -30,16 +35,13 @@ class Control:
             self.m_yaw = vehicle_data.yaw / 180 * math.pi
 
             # 获取全局车辆
-            all_vehicles = self.udp_client.get_all_vehicle_state()
+            self.all_vehicles = self.udp_client.get_all_vehicle_state()
 
             # 纯跟踪算法
             delta, target_point = algorithm.pure_pursuit(self.m_x, self.m_y, self.m_yaw, vehicle_data.speed)
 
             # 冲突检测
-            fake_car = vehicle.VehicleData() # 测试用
-            fake_car.set_vehicle_stake(100, 153, "D5") # 测试用
-            all_vehicles.update_vehicle_data(fake_car) # 测试用
-            is_conflict = algorithm.conflict_detection(vehicle_data, all_vehicles.get_data())
+            is_conflict = algorithm.conflict_detection(vehicle_data, self.all_vehicles.get_data())
 
             # 更新速度和转向角
             if is_conflict:
@@ -52,7 +54,7 @@ class Control:
                 w = delta
 
             # 更新小地图
-            map.update_plot(vehicle_data, target_point, all_vehicles.get_data())
+            map.update_plot(vehicle_data, target_point, self.all_vehicles.get_data())
 
             # 发送控制命令
             self.udp_client.send_control_command(v, w)
@@ -63,6 +65,11 @@ class Control:
             time.sleep(sleep_time)
             start_time = time.time()
 
+    # 测试用
+    # def receive_from_server(self, x, y):
+    #     fake_car = vehicle.VehicleData()
+    #     fake_car.set_vehicle_stake(x, y, "huang")
+    #     self.all_vehicles.update_vehicle_data(fake_car)
 
 if __name__ == '__main__':
     control = Control()
