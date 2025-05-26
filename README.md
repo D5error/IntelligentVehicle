@@ -1,8 +1,6 @@
 # Multi-agent swarm control (intelligent vehicle part) experiment
 这是多智能体集群控制（智能车部分）实验的代码部分，用于个人备份。
 
-![map](assets/map.png)
-
 ## Requirements
 * python 3.12
 
